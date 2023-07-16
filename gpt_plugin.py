@@ -11,7 +11,6 @@ class GptPlugin(object):
     @pynvim.command('Gpt', nargs='*', range='')
     def gpt_command(self, args, range):
         openai.api_key = os.getenv('OPENAI_API_KEY')
-
         prompt = ' '.join(args)
 
         system_content = """
@@ -27,11 +26,12 @@ class GptPlugin(object):
             ]
         )
 
-        # Extract code between ``` marks and remove potential language hint (e.g., ruby)
-        code = re.findall(r'```(?:\w+\n)?(.*?)```', response.choices[0].message['content'], re.DOTALL)
-
+        code = self.parse_response(response['choices'][0]['message']['content'])
         if code:
-            # Clear the current buffer and replace with API response
-            self.nvim.current.buffer[:] = code[0].strip().split('\n')
+            self.nvim.current.buffer[:] = code.strip().split('\n')
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
+
+    def parse_response(self, response):
+        code = re.findall(r'```(?:\w+\n)?(.*?)```', response, re.DOTALL)
+        return code[0].strip() if code else None

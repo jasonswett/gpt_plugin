@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 pytest = "*"
+openai = "*"
+pynvim = "*"
 
 [dev-packages]
 
