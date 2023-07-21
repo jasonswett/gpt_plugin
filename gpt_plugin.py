@@ -24,6 +24,7 @@ class GptPlugin(object):
         self.nvim.command('echo "Waiting for OpenAI API response..."')
 
         response = self.openai_api_response(args)
+        self.write_to_file(str(response))
         code_block = self.code_block(response)
 
         if code_block:
@@ -36,13 +37,14 @@ class GptPlugin(object):
     def openai_api_response(self, args):
         openai.api_key = os.getenv('OPENAI_API_KEY')
 
-        return openai.ChatCompletion.create(
+        response = openai.ChatCompletion.create(
           model=OPENAI_MODEL,
           messages=[
                 {"role": "system", "content": SYSTEM_CONTENT.strip()},
                 {"role": "user", "content": ' '.join(args)}
             ]
         )
+        return response
 
     def code_block(self, response):
         content = response['choices'][0]['message']['content']
@@ -55,3 +57,7 @@ class GptPlugin(object):
     def run_test_in_tmux(self):
         filename = "my_spec.rb"
         self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "rspec {filename}" Enter')
+
+    def write_to_file(self, message):
+        with open('/Users/jasonswett/Documents/code/gpt_plugin/log/gpt_plugin.log', 'a') as f:
+            f.write(f"{message}\n")
