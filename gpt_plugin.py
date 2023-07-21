@@ -27,12 +27,12 @@ class GptPlugin(object):
             ]
         )
 
-        code = self.parse_response(response['choices'][0]['message']['content'])
+        code = self.code_block(response['choices'][0]['message']['content'])
         if code:
             self.nvim.current.buffer[:] = code.strip().split('\n')
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
 
-    def parse_response(self, response):
+    def code_block(self, response):
         code = re.findall(r'```(?:\w+\n)?(.*?)```', response, re.DOTALL)
         return code[0].strip() if code else None
