@@ -22,23 +22,26 @@ class GptPlugin(object):
 
         self.nvim.command('echo "Waiting for API response..."')
 
-        openai.api_key = os.getenv('OPENAI_API_KEY')
-
-        response = openai.ChatCompletion.create(
-          model=OPENAI_MODEL,
-          messages=[
-                {"role": "system", "content": SYSTEM_CONTENT.strip()},
-                {"role": "user", "content": ' '.join(args)}
-            ]
-        )
-
+        response = self.openai_api_response(args)
         code_block = self.code_block(response)
+
         if code_block:
             self.nvim.current.buffer[:] = code_block.strip().split('\n')
             self.nvim.command('w my_spec.rb')
             self.run_rspec_in_tmux(code_block)
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
+
+    def openai_api_response(self, args):
+        openai.api_key = os.getenv('OPENAI_API_KEY')
+
+        return openai.ChatCompletion.create(
+          model=OPENAI_MODEL,
+          messages=[
+                {"role": "system", "content": SYSTEM_CONTENT.strip()},
+                {"role": "user", "content": ' '.join(args)}
+            ]
+        )
 
     def code_block(self, response):
         content = response['choices'][0]['message']['content']
