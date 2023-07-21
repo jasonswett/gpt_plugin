@@ -20,6 +20,8 @@ class GptPlugin(object):
         if self.tmux_pane is None:
             self.tmux_pane = self.prompt_tmux_pane()
 
+        self.nvim.command('echo "Waiting for API response..."')
+
         openai.api_key = os.getenv('OPENAI_API_KEY')
 
         response = openai.ChatCompletion.create(
