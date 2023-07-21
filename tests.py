@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 from gpt_plugin import GptPlugin
 
 def test_code_block_with_code_block():
