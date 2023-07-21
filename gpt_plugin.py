@@ -11,7 +11,6 @@ class GptPlugin(object):
     @pynvim.command('Gpt', nargs='*', range='')
     def gpt_command(self, args, range):
         openai.api_key = os.getenv('OPENAI_API_KEY')
-        prompt = ' '.join(args)
 
         system_content = """
         You are connected to a Vim plugin that helps me write code.
@@ -22,7 +21,7 @@ class GptPlugin(object):
           model="gpt-3.5-turbo",
           messages=[
                 {"role": "system", "content": system_content.strip()},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": ' '.join(args)}
             ]
         )
 
