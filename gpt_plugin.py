@@ -27,9 +27,9 @@ class GptPlugin(object):
             ]
         )
 
-        code = self.code_block(response)
-        if code:
-            self.nvim.current.buffer[:] = code.strip().split('\n')
+        code_block = self.code_block(response)
+        if code_block:
+            self.nvim.current.buffer[:] = code_block.strip().split('\n')
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
 
