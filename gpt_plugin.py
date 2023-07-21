@@ -5,7 +5,14 @@ import re
 
 SYSTEM_CONTENT = """
 You are connected to a Vim plugin that helps me write code.
-Your response should contain exactly ONE code block which I can copy and paste.
+Your response should be formatted as follows.
+There should be NOTHING in your response except the filename and file content.
+
+Example:
+my_spec.rb
+```ruby
+RSpec.describe "stuff" do
+end
 """
 
 OPENAI_MODEL="gpt-3.5-turbo"
@@ -48,8 +55,17 @@ class GptPlugin(object):
 
     def code_block(self, response):
         content = response['choices'][0]['message']['content']
-        code = re.findall(r'```(?:\w+\n)?(.*?)```', content, re.DOTALL)
-        return code[0].strip() if code else None
+        filename_content = content.split('\n', 1)
+
+        if len(filename_content) < 2:
+            return None
+
+        code_content = filename_content[1].strip()
+
+        # Remove code fences
+        code_content = re.sub(r'```.*$', '', code_content, flags=re.MULTILINE)  # remove the opening code fence
+        code_content = code_content.rstrip("`")  # remove the closing code fence
+        return code_content.strip()  # return the content part after stripping the leading and trailing whitespaces
 
     def prompt_tmux_pane(self):
         return self.nvim.eval('input("Please enter tmux pane ID or name: ")')
