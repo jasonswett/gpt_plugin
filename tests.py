@@ -1,9 +1,9 @@
 from gpt_plugin import GptPlugin
 
-def test_parse_response_with_code_block():
+def test_code_block_with_code_block():
     plugin = GptPlugin(None)
 
-    response = """
+    content = """
     Here is some code:
     ```python
     def test():
@@ -11,15 +11,31 @@ def test_parse_response_with_code_block():
     ```
     """
 
-    code = plugin.parse_response(response)
+    response = {
+        'choices': [
+            {
+                'message': {
+                    'content': content
+                }
+            }
+        ]
+    }
+
+    code = plugin.code_block(response)
     assert code == "def test():\n    assert True"
 
-def test_parse_response_without_code_block():
+def test_code_block_without_code_block():
     plugin = GptPlugin(None)
 
-    response = """
-    There is no code block present
-    """
+    response = {
+        'choices': [
+            {
+                'message': {
+                    'content': "There is no code block present"
+                }
+            }
+        ]
+    }
 
-    code = plugin.parse_response(response)
+    code = plugin.code_block(response)
     assert code is None
