@@ -9,6 +9,7 @@ Your response should contain exactly ONE code block which I can copy and paste.
 """
 
 OPENAI_MODEL="gpt-3.5-turbo"
+
 @pynvim.plugin
 class GptPlugin(object):
     def __init__(self, nvim):
@@ -20,7 +21,7 @@ class GptPlugin(object):
         if self.tmux_pane is None:
             self.tmux_pane = self.prompt_tmux_pane()
 
-        self.nvim.command('echo "Waiting for API response..."')
+        self.nvim.command('echo "Waiting for OpenAI API response..."')
 
         response = self.openai_api_response(args)
         code_block = self.code_block(response)
