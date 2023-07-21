@@ -28,7 +28,7 @@ class GptPlugin(object):
         if code_block:
             self.nvim.current.buffer[:] = code_block
             self.nvim.command('w my_spec.rb')
-            self.run_rspec_in_tmux()
+            self.run_test_in_tmux()
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
 
@@ -51,6 +51,6 @@ class GptPlugin(object):
     def prompt_tmux_pane(self):
         return self.nvim.eval('input("Please enter tmux pane ID or name: ")')
 
-    def run_rspec_in_tmux(self):
+    def run_test_in_tmux(self):
         filename = "my_spec.rb"
         self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "rspec {filename}" Enter')
