@@ -28,7 +28,7 @@ class GptPlugin(object):
         code_block = self.code_block(response)
 
         if code_block:
-            self.nvim.current.buffer[:] = code_block
+            self.nvim.current.buffer[:] = code_block.split('\n')
             self.nvim.command('w my_spec.rb')
             self.run_test_in_tmux()
         else:
@@ -49,7 +49,7 @@ class GptPlugin(object):
     def code_block(self, response):
         content = response['choices'][0]['message']['content']
         code = re.findall(r'```(?:\w+\n)?(.*?)```', content, re.DOTALL)
-        return code[0].strip().split('\n') if code else None
+        return code[0].strip() if code else None
 
     def prompt_tmux_pane(self):
         return self.nvim.eval('input("Please enter tmux pane ID or name: ")')
