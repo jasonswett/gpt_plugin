@@ -8,6 +8,8 @@ You are connected to a Vim plugin that helps me write code.
 Your response should contain exactly ONE code block which I can copy and paste.
 """
 
+OPENAI_MODEL="gpt-3.5-turbo"
+
 @pynvim.plugin
 class GptPlugin(object):
     def __init__(self, nvim):
@@ -18,7 +20,7 @@ class GptPlugin(object):
         openai.api_key = os.getenv('OPENAI_API_KEY')
 
         response = openai.ChatCompletion.create(
-          model="gpt-3.5-turbo",
+          model=OPENAI_MODEL,
           messages=[
                 {"role": "system", "content": SYSTEM_CONTENT.strip()},
                 {"role": "user", "content": ' '.join(args)}
