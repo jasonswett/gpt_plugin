@@ -3,6 +3,11 @@ import openai
 import pynvim
 import re
 
+SYSTEM_CONTENT = """
+You are connected to a Vim plugin that helps me write code.
+Your response should contain exactly ONE code block which I can copy and paste.
+"""
+
 @pynvim.plugin
 class GptPlugin(object):
     def __init__(self, nvim):
@@ -12,15 +17,10 @@ class GptPlugin(object):
     def gpt_command(self, args, range):
         openai.api_key = os.getenv('OPENAI_API_KEY')
 
-        system_content = """
-        You are connected to a Vim plugin that helps me write code.
-        Your response should contain exactly ONE code block which I can copy and paste.
-        """
-
         response = openai.ChatCompletion.create(
           model="gpt-3.5-turbo",
           messages=[
-                {"role": "system", "content": system_content.strip()},
+                {"role": "system", "content": SYSTEM_CONTENT.strip()},
                 {"role": "user", "content": ' '.join(args)}
             ]
         )
