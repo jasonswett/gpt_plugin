@@ -1,12 +1,10 @@
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-from gpt_plugin import GptPlugin
+from .openai_api_response import OpenAIAPIResponse
 
 def test_code_block_with_code_block():
-    plugin = GptPlugin(None)
-
-    response = {
+    response_body = {
       "id": "chatcmpl-7esy9Xuc3Fjuakwa8wp1BCpya5rkE",
       "object": "chat.completion",
       "created": 1689978777,
@@ -28,5 +26,6 @@ def test_code_block_with_code_block():
       }
     }
 
-    code = plugin.code_block(response)
+    api_response = OpenAIAPIResponse(response_body)
+    code = api_response.code_block()
     assert code == "RSpec.describe \"stuff\" do\nend"
