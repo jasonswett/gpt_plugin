@@ -31,9 +31,9 @@ class GptPlugin(object):
 
         self.nvim.command('echo "Waiting for OpenAI API response..."')
 
-        response = self.openai_api_response(args)
-        self.write_to_file(str(response))
-        code_block = self.code_block(response)
+        openai_api_response = self.openai_api_response(args)
+        self.write_to_file(str(openai_api_response.body))
+        code_block = self.code_block(openai_api_response.body)
 
         if code_block:
             self.nvim.current.buffer[:] = code_block.split('\n')
@@ -52,7 +52,7 @@ class GptPlugin(object):
                 {"role": "user", "content": ' '.join(args)}
             ]
         )
-        return OpenAIAPIResponse(response).body
+        return OpenAIAPIResponse(response)
 
     def code_block(self, response):
         content = response['choices'][0]['message']['content']
