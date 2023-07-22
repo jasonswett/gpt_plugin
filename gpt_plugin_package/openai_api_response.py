@@ -5,4 +5,10 @@ class OpenAIAPIResponse:
         self.body = body
 
     def code_block(self):
-        return OpenAIAPIResponseContent(self.body['choices'][0]['message']['content']).code_block()
+        return self.content().code_block()
+
+    def filename(self):
+        return self.content().filename()
+
+    def content(self):
+        return OpenAIAPIResponseContent(self.body['choices'][0]['message']['content'])

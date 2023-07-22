@@ -18,11 +18,12 @@ class GptPlugin(object):
         openai_api_response = self.openai_api_response(args)
         self.write_to_file(str(openai_api_response.body))
         code_block = openai_api_response.code_block()
+        filename = openai_api_response.filename()
 
         if code_block:
             self.nvim.current.buffer[:] = code_block.split('\n')
-            self.nvim.command('w my_spec.rb')
-            self.run_test_in_tmux()
+            self.nvim.command(f'w {filename}')
+            self.run_test_in_tmux(filename)
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
 
@@ -33,8 +34,7 @@ class GptPlugin(object):
     def prompt_tmux_pane(self):
         return self.nvim.eval('input("Please enter tmux pane ID or name: ")')
 
-    def run_test_in_tmux(self):
-        filename = "my_spec.rb"
+    def run_test_in_tmux(self, filename):
         self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "rspec {filename}" Enter')
 
     def write_to_file(self, message):
