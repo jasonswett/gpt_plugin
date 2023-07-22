@@ -1,31 +1,11 @@
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-from .openai_api_response import OpenAIAPIResponse
+from .openai_api_response_content import OpenAIAPIResponseContent
 
 def test_code_block_with_code_block():
-    response_body = {
-      "id": "chatcmpl-7esy9Xuc3Fjuakwa8wp1BCpya5rkE",
-      "object": "chat.completion",
-      "created": 1689978777,
-      "model": "gpt-3.5-turbo-0613",
-      "choices": [
-        {
-          "index": 0,
-          "message": {
-            "role": "assistant",
-            "content": "test_spec.rb\n\n```ruby\nRSpec.describe \"stuff\" do\nend\n```"
-          },
-          "finish_reason": "stop"
-        }
-      ],
-      "usage": {
-        "prompt_tokens": 72,
-        "completion_tokens": 51,
-        "total_tokens": 123
-      }
-    }
+    body = "test_spec.rb\n\n```ruby\nRSpec.describe \"stuff\" do\nend\n```"
 
-    api_response = OpenAIAPIResponse(response_body)
-    code = api_response.code_block()
+    content = OpenAIAPIResponseContent(body)
+    code = content.code_block()
     assert code == "RSpec.describe \"stuff\" do\nend"
