@@ -2,6 +2,7 @@ import os
 import openai
 import pynvim
 import re
+from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
 
 SYSTEM_CONTENT = """
 You are connected to a Vim plugin that helps me write code.
@@ -51,7 +52,7 @@ class GptPlugin(object):
                 {"role": "user", "content": ' '.join(args)}
             ]
         )
-        return response
+        return OpenAIAPIResponse(response).body
 
     def code_block(self, response):
         content = response['choices'][0]['message']['content']
