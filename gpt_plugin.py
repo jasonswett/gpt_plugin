@@ -1,7 +1,6 @@
 import os
 import openai
 import pynvim
-import re
 from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
 
 SYSTEM_CONTENT = """
@@ -33,7 +32,7 @@ class GptPlugin(object):
 
         openai_api_response = self.openai_api_response(args)
         self.write_to_file(str(openai_api_response.body))
-        code_block = self.code_block(openai_api_response.body)
+        code_block = openai_api_response.code_block()
 
         if code_block:
             self.nvim.current.buffer[:] = code_block.split('\n')
@@ -53,20 +52,6 @@ class GptPlugin(object):
             ]
         )
         return OpenAIAPIResponse(response)
-
-    def code_block(self, response):
-        content = response['choices'][0]['message']['content']
-        filename_content = content.split('\n', 1)
-
-        if len(filename_content) < 2:
-            return None
-
-        code_content = filename_content[1].strip()
-
-        # Remove code fences
-        code_content = re.sub(r'```.*$', '', code_content, flags=re.MULTILINE)  # remove the opening code fence
-        code_content = code_content.rstrip("`")  # remove the closing code fence
-        return code_content.strip()  # return the content part after stripping the leading and trailing whitespaces
 
     def prompt_tmux_pane(self):
         return self.nvim.eval('input("Please enter tmux pane ID or name: ")')
