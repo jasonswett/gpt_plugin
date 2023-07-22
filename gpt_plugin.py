@@ -1,21 +1,6 @@
-import os
-import openai
 import pynvim
+from gpt_plugin_package.openai_api_request import OpenAIAPIRequest
 from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
-
-SYSTEM_CONTENT = """
-You are connected to a Vim plugin that helps me write code.
-Your response should be formatted as follows.
-There should be NOTHING in your response except the filename and file content.
-
-Example:
-my_spec.rb
-```ruby
-RSpec.describe "stuff" do
-end
-"""
-
-OPENAI_MODEL="gpt-3.5-turbo"
 
 @pynvim.plugin
 class GptPlugin(object):
@@ -42,15 +27,7 @@ class GptPlugin(object):
             self.nvim.current.buffer[:] = ["No code found in response"]
 
     def openai_api_response(self, args):
-        openai.api_key = os.getenv('OPENAI_API_KEY')
-
-        response = openai.ChatCompletion.create(
-          model=OPENAI_MODEL,
-          messages=[
-                {"role": "system", "content": SYSTEM_CONTENT.strip()},
-                {"role": "user", "content": ' '.join(args)}
-            ]
-        )
+        response = OpenAIAPIRequest(args).send()
         return OpenAIAPIResponse(response)
 
     def prompt_tmux_pane(self):
