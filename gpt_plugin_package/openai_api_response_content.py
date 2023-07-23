@@ -12,8 +12,8 @@ class OpenAIAPIResponseContent:
         return filename_line.replace('filename: ', '')
 
     def code_block(self):
-        matches = re.findall(r'```ruby(.*)```', self.body, re.DOTALL)
-        return matches[0].strip() if matches else None
+        matches = re.findall(r'```(\w+)(.*)```', self.body, re.DOTALL)
+        return matches[0][1].strip() if matches else None
 
     def test_command(self):
         command_content = self.body.split('\n', 2)
