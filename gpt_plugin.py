@@ -22,11 +22,7 @@ class GptPlugin(object):
             self.tmux_pane = self.prompt_tmux_pane()
 
         request = self.request(' '.join(args))
-
-        self.nvim.command('echo "Waiting for OpenAI API response..."')
-        response = OpenAIAPIResponse(request.send())
-        self.write_to_log(str(response.body))
-
+        response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
         self.run_test_in_tmux(response.test_command())
 
@@ -48,10 +44,7 @@ Here is the failure message:
 Write me the code that will make this failure message go away."""
 
         request = self.request(message)
-
-        response = OpenAIAPIResponse(request.send())
-        self.write_to_log(str(response.body))
-
+        response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
         self.run_test_in_tmux(response.test_command())
 
@@ -100,3 +93,9 @@ Write me the code that will make this failure message go away."""
         request = OpenAIAPIRequest(user_content)
         self.write_to_log(str(request.messages()))
         return request
+
+    def response(self, request):
+        self.nvim.command('echo "Waiting for OpenAI API response..."')
+        response = OpenAIAPIResponse(request.send())
+        self.write_to_log(str(response.body))
+        return response
