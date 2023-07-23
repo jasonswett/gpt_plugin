@@ -22,7 +22,8 @@ class GptPlugin(object):
 
         self.nvim.command('echo "Waiting for OpenAI API response..."')
 
-        response = self.openai_api_response(args)
+        request = OpenAIAPIRequest(args)
+        response = self.openai_api_response(request)
         self.write_to_log(str(response.body))
         code_block = response.code_block()
         filename = os.path.join(self.directory, response.filename())
@@ -43,8 +44,8 @@ class GptPlugin(object):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         self.nvim.command(f'w! {filename}')
 
-    def openai_api_response(self, args):
-        response = OpenAIAPIRequest(args).send()
+    def openai_api_response(self, request):
+        response = request.send()
         return OpenAIAPIResponse(response)
 
     def prompt_directory(self):
