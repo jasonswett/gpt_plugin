@@ -1,3 +1,4 @@
+import os
 import pynvim
 from gpt_plugin_package.openai_api_request import OpenAIAPIRequest
 from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
@@ -21,6 +22,10 @@ class GptPlugin(object):
         filename = openai_api_response.filename()
 
         if code_block:
+            dir_name = os.path.dirname(filename)
+            if not os.path.exists(dir_name):
+                os.makedirs(dir_name)
+
             self.nvim.command(f'silent! bwipeout! {filename}')
             self.nvim.command('enew')
             self.nvim.current.buffer[:] = code_block.split('\n')
