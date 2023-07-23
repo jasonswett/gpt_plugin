@@ -8,7 +8,8 @@ class OpenAIAPIResponseContent:
         filename_content = self.body.split('\n', 2)
         if len(filename_content) < 2:
             return None
-        return filename_content[0].strip()
+        filename_line = filename_content[0].strip()
+        return filename_line.replace('filename: ', '')
 
     def code_block(self):
         matches = re.findall(r'```ruby(.*)```', self.body, re.DOTALL)
@@ -18,4 +19,5 @@ class OpenAIAPIResponseContent:
         command_content = self.body.split('\n', 2)
         if len(command_content) < 2:
             return None
-        return command_content[1].strip().strip('"')
+        command_line = command_content[1].strip().strip('"')
+        return command_line.replace('test command: ', '')

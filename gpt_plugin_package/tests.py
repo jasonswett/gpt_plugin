@@ -17,8 +17,22 @@ def test_filename_extraction():
     filename = content.filename()
     assert filename == 'test_spec.rb'
 
+def test_sloppy_filename_extraction():
+    body = 'filename: test_spec.rb\n"rspec test_spec.rb"\n\n```ruby\nRSpec.describe "stuff" do\nend\n```'
+
+    content = OpenAIAPIResponseContent(body)
+    filename = content.filename()
+    assert filename == 'test_spec.rb'
+
 def test_test_command_extraction():
     body = 'test_spec.rb\n"rspec test_spec.rb"\n\n```ruby\nRSpec.describe "stuff" do\nend\n```'
+
+    content = OpenAIAPIResponseContent(body)
+    test_command = content.test_command()
+    assert test_command == 'rspec test_spec.rb'
+
+def test_sloppy_test_command_extraction():
+    body = 'test_spec.rb\n"test command: rspec test_spec.rb"\n\n```ruby\nRSpec.describe "stuff" do\nend\n```'
 
     content = OpenAIAPIResponseContent(body)
     test_command = content.test_command()
