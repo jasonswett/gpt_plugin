@@ -29,14 +29,12 @@ class GptPlugin(object):
 
     @pynvim.command('GptSendTestResult', nargs='*', range='')
     def gpt_send_test_result(self, args, range):
-        filename = self.nvim.current.buffer.name
-        buffer_content = "\n".join(self.nvim.current.buffer[:])
         tmux_capture_command = f'tmux capture-pane -t {self.tmux_pane} -p'
         failure_message = subprocess.check_output(tmux_capture_command, shell=True, text=True)
 
         test_failure_request_message = TestFailureRequestMessage(
-            filename,
-            buffer_content,
+            self.current_filename(),
+            self.current_buffer_content(),
             failure_message
         )
 
@@ -96,3 +94,9 @@ class GptPlugin(object):
         response = OpenAIAPIResponse(request.send())
         self.write_to_log(str(response.body))
         return response
+
+    def current_filename(self):
+        return self.nvim.current.buffer.name
+
+    def current_buffer_content(self):
+        return "\n".join(self.nvim.current.buffer[:])
