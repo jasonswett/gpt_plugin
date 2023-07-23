@@ -21,8 +21,10 @@ class GptPlugin(object):
         filename = openai_api_response.filename()
 
         if code_block:
+            self.nvim.command(f'silent! bwipeout! {filename}')
+            self.nvim.command('enew')
             self.nvim.current.buffer[:] = code_block.split('\n')
-            self.nvim.command(f'w {filename}')
+            self.nvim.command(f'w! {filename}')
             self.run_test_in_tmux(filename)
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
