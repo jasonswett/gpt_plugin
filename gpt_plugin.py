@@ -30,6 +30,7 @@ class GptPlugin(object):
         self.write_to_log(str(response.body))
 
         self.insert_code_block(response.filename(), response.code_block())
+        self.run_test_in_tmux(response.test_command())
 
     @pynvim.command('GptSendTestResult', nargs='*', range='')
     def gpt_send_test_result(self, args, range):
@@ -55,13 +56,13 @@ Write me the code that will make this failure message go away."""
         self.write_to_log(str(response.body))
 
         self.insert_code_block(response.filename(), response.code_block())
+        self.run_test_in_tmux(response.test_command())
 
     def insert_code_block(self, filename, code_block):
         if code_block:
             path = os.path.join(self.directory, filename)
             self.insert_content_into_buffer(path, code_block.split('\n'))
             self.save_file(path)
-            self.run_test_in_tmux(path)
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
 
@@ -80,8 +81,8 @@ Write me the code that will make this failure message go away."""
     def prompt_tmux_pane(self):
         return self.nvim.eval('input("tmux pane ID: ")')
 
-    def run_test_in_tmux(self, filename):
-        self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "rspec {filename}" Enter')
+    def run_test_in_tmux(self, test_command):
+        self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "{test_command}" Enter')
 
     def write_to_log(self, message):
         with open(LOG_FILENAME, 'a') as f:

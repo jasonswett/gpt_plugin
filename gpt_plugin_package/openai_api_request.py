@@ -3,11 +3,25 @@ import openai
 
 SYSTEM_CONTENT = """
 You are connected to a Vim plugin that helps me write code.
-Your response should be formatted as follows.
-There should be NOTHING in your response except the filename and file content.
+Your response should contain the filename, the test command to be used, and the file content.
 
-Example:
+Good example:
 my_spec.rb
+rspec my_spec.rb
+```ruby
+RSpec.describe "stuff" do
+end
+
+Good example:
+spec/calculator_spec.rb
+rspec spec/calculator_spec.rb
+```ruby
+RSpec.describe Calculator do
+end
+
+Bad example:
+my_spec.rb
+The test command is: "rspec my_spec.rb"
 ```ruby
 RSpec.describe "stuff" do
 end
