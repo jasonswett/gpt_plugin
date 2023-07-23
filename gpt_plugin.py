@@ -3,6 +3,8 @@ import pynvim
 from gpt_plugin_package.openai_api_request import OpenAIAPIRequest
 from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
 
+LOG_FILENAME = '/Users/jasonswett/Documents/code/gpt_plugin/log/gpt_plugin.log'
+
 @pynvim.plugin
 class GptPlugin(object):
     def __init__(self, nvim):
@@ -55,5 +57,5 @@ class GptPlugin(object):
         self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "rspec {filename}" Enter')
 
     def write_to_log(self, message):
-        with open('/Users/jasonswett/Documents/code/gpt_plugin/log/gpt_plugin.log', 'a') as f:
+        with open(LOG_FILENAME, 'a') as f:
             f.write(f"{message}\n")
