@@ -1,4 +1,5 @@
 import os
+import subprocess
 import pynvim
 from gpt_plugin_package.openai_api_request import OpenAIAPIRequest
 from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
@@ -29,6 +30,28 @@ class GptPlugin(object):
         self.write_to_log(str(response.body))
 
         self.insert_code_block(response.filename(), response.code_block())
+
+    @pynvim.command('GptSendTestResult', nargs='*', range='')
+    def gpt_send_test_result(self, args, range):
+        filename = self.nvim.current.buffer.name
+        buffer_content = "\n".join(self.nvim.current.buffer[:])
+        tmux_capture_command = f'tmux capture-pane -t {self.tmux_pane} -p'
+        failure_message = subprocess.check_output(tmux_capture_command, shell=True, text=True)
+
+        message = f"""This is my test:
+{filename}
+{buffer_content}
+
+Here is the failure message:
+{failure_message}
+
+Write me the code that will make this failure message go away."""
+
+        request = OpenAIAPIRequest(message)
+        self.write_to_log(str(request.messages()))
+
+        response = OpenAIAPIResponse(request.send())
+        self.write_to_log(str(response.body))
 
     def insert_code_block(self, filename, code_block):
         if code_block:
