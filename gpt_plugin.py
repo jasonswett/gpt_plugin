@@ -46,17 +46,13 @@ class GptPlugin(object):
         if code_block:
             path = os.path.join(self.directory, filename)
 
-            # Check if current buffer is truly empty using Vimscript function bufname('%')
-            current_buffer_name = self.nvim.eval('bufname("%")')
-            is_current_buffer_empty = (current_buffer_name == "")
-
             # Get all open buffers
             buffers = self.nvim.buffers
 
             # Check if buffer with filename already exists
             is_buffer_open = any([buf.name.endswith(filename) for buf in buffers])
 
-            if not is_buffer_open and not is_current_buffer_empty:
+            if not is_buffer_open and not self.is_current_buffer_empty():
                 # Create a new tab if the current buffer is not empty
                 self.nvim.command('tabnew')
 
@@ -103,3 +99,7 @@ class GptPlugin(object):
     def tmux_pane_content(self):
         command = f'tmux capture-pane -t {self.tmux_pane} -p'
         return subprocess.check_output(command, shell=True, text=True)
+
+    def is_current_buffer_empty(self):
+        current_buffer_name = self.nvim.eval('bufname("%")')
+        return current_buffer_name == ""
