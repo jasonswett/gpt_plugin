@@ -54,6 +54,8 @@ Write me the code that will make this failure message go away."""
         response = OpenAIAPIResponse(request.send())
         self.write_to_log(str(response.body))
 
+        self.insert_code_block(response.filename(), response.code_block())
+
     def insert_code_block(self, filename, code_block):
         if code_block:
             path = os.path.join(self.directory, filename)
