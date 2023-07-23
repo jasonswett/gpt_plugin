@@ -29,8 +29,7 @@ class GptPlugin(object):
 
     @pynvim.command('GptSendTestResult', nargs='*', range='')
     def gpt_send_test_result(self, args, range):
-        tmux_capture_command = f'tmux capture-pane -t {self.tmux_pane} -p'
-        failure_message = subprocess.check_output(tmux_capture_command, shell=True, text=True)
+        failure_message = self.tmux_pane_content()
 
         test_failure_request_message = TestFailureRequestMessage(
             self.current_filename(),
@@ -100,3 +99,7 @@ class GptPlugin(object):
 
     def current_buffer_content(self):
         return "\n".join(self.nvim.current.buffer[:])
+
+    def tmux_pane_content(self):
+        command = f'tmux capture-pane -t {self.tmux_pane} -p'
+        return subprocess.check_output(command, shell=True, text=True)
