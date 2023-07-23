@@ -26,9 +26,7 @@ class GptPlugin(object):
         filename = os.path.join(self.directory, openai_api_response.filename())
 
         if code_block:
-            self.nvim.command(f'silent! bwipeout! {filename}')
-            self.nvim.command('enew')
-            self.nvim.current.buffer[:] = code_block.split('\n')
+            self.insert_content_into_buffer(filename, code_block.split('\n'))
 
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             self.nvim.command(f'w! {filename}')
@@ -36,6 +34,11 @@ class GptPlugin(object):
             self.run_test_in_tmux(filename)
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
+
+    def insert_content_into_buffer(self, filename, content):
+        self.nvim.command(f'silent! bwipeout! {filename}')
+        self.nvim.command('enew')
+        self.nvim.current.buffer[:] = content
 
     def openai_api_response(self, args):
         response = OpenAIAPIRequest(args).send()
