@@ -21,16 +21,13 @@ class GptPlugin(object):
         self.nvim.command('echo "Waiting for OpenAI API response..."')
 
         openai_api_response = self.openai_api_response(args)
-        self.write_to_file(str(openai_api_response.body))
+        self.write_to_log(str(openai_api_response.body))
         code_block = openai_api_response.code_block()
         filename = os.path.join(self.directory, openai_api_response.filename())
 
         if code_block:
             self.insert_content_into_buffer(filename, code_block.split('\n'))
-
-            os.makedirs(os.path.dirname(filename), exist_ok=True)
-            self.nvim.command(f'w! {filename}')
-
+            self.save_file(filename)
             self.run_test_in_tmux(filename)
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
@@ -39,6 +36,10 @@ class GptPlugin(object):
         self.nvim.command(f'silent! bwipeout! {filename}')
         self.nvim.command('enew')
         self.nvim.current.buffer[:] = content
+
+    def save_file(self, filename):
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        self.nvim.command(f'w! {filename}')
 
     def openai_api_response(self, args):
         response = OpenAIAPIRequest(args).send()
@@ -53,6 +54,6 @@ class GptPlugin(object):
     def run_test_in_tmux(self, filename):
         self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "rspec {filename}" Enter')
 
-    def write_to_file(self, message):
+    def write_to_log(self, message):
         with open('/Users/jasonswett/Documents/code/gpt_plugin/log/gpt_plugin.log', 'a') as f:
             f.write(f"{message}\n")
