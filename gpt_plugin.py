@@ -44,20 +44,11 @@ class GptPlugin(object):
 
     def insert_code_block(self, filename, code_block):
         if code_block:
-            path = os.path.join(self.directory, filename)
-
-            # Get all open buffers
-            buffers = self.nvim.buffers
-
-            # Check if buffer with filename already exists
-            is_buffer_open = any([buf.name.endswith(filename) for buf in buffers])
-
-            if not is_buffer_open and not self.is_current_buffer_empty():
-                # Create a new tab if the current buffer is not empty
+            if not self.is_buffer_with_filename_open(filename) and not self.is_current_buffer_empty():
                 self.nvim.command('tabnew')
 
-            # Insert the code block
             self.nvim.current.buffer[:] = code_block.split('\n')
+            path = os.path.join(self.directory, filename)
             self.save_file(path)
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
@@ -103,3 +94,7 @@ class GptPlugin(object):
     def is_current_buffer_empty(self):
         current_buffer_name = self.nvim.eval('bufname("%")')
         return current_buffer_name == ""
+
+    def is_buffer_with_filename_open(self, filename):
+        all_open_buffers = self.nvim.buffers
+        return any([buffer.name.endswith(filename) for buffer in all_open_buffers])
