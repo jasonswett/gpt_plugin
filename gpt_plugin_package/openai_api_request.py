@@ -16,8 +16,8 @@ end
 OPENAI_MODEL="gpt-3.5-turbo"
 
 class OpenAIAPIRequest:
-    def __init__(self, args):
-        self.args = args
+    def __init__(self, user_content):
+        self.user_content = user_content
 
     def send(self):
         openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -30,5 +30,5 @@ class OpenAIAPIRequest:
     def messages(self):
         return [
                 {"role": "system", "content": SYSTEM_CONTENT.strip()},
-                {"role": "user", "content": ' '.join(self.args)}
+                {"role": "user", "content": self.user_content}
             ]

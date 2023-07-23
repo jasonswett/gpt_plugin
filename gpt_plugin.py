@@ -23,7 +23,7 @@ class GptPlugin(object):
 
         self.nvim.command('echo "Waiting for OpenAI API response..."')
 
-        request = OpenAIAPIRequest(args)
+        request = OpenAIAPIRequest(' '.join(args))
         self.write_to_log(str(request.messages()))
 
         response = OpenAIAPIResponse(request.send())
@@ -38,7 +38,8 @@ class GptPlugin(object):
         tmux_capture_command = f'tmux capture-pane -t {self.tmux_pane} -p'
         failure_message = subprocess.check_output(tmux_capture_command, shell=True, text=True)
 
-        message = f"""This is my test:
+        message = f"""
+This is my test:
 {filename}
 {buffer_content}
 
