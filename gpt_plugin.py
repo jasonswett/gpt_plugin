@@ -28,13 +28,14 @@ class GptPlugin(object):
         response = OpenAIAPIResponse(request.send())
         self.write_to_log(str(response.body))
 
-        code_block = response.code_block()
-        filename = os.path.join(self.directory, response.filename())
+        self.insert_code_block(response.filename(), response.code_block())
 
+    def insert_code_block(self, filename, code_block):
         if code_block:
-            self.insert_content_into_buffer(filename, code_block.split('\n'))
-            self.save_file(filename)
-            self.run_test_in_tmux(filename)
+            path = os.path.join(self.directory, filename)
+            self.insert_content_into_buffer(path, code_block.split('\n'))
+            self.save_file(path)
+            self.run_test_in_tmux(path)
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
 
