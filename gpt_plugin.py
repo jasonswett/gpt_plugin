@@ -61,15 +61,26 @@ Write me the code that will make this failure message go away."""
     def insert_code_block(self, filename, code_block):
         if code_block:
             path = os.path.join(self.directory, filename)
-            self.insert_content_into_buffer(path, code_block.split('\n'))
+
+            # Check if current buffer is truly empty using Vimscript function bufname('%')
+            current_buffer_name = self.nvim.eval('bufname("%")')
+            is_current_buffer_empty = (current_buffer_name == "")
+
+            # Get all open buffers
+            buffers = self.nvim.buffers
+
+            # Check if buffer with filename already exists
+            is_buffer_open = any([buf.name.endswith(filename) for buf in buffers])
+
+            if not is_buffer_open and not is_current_buffer_empty:
+                # Create a new tab if the current buffer is not empty
+                self.nvim.command('tabnew')
+
+            # Insert the code block
+            self.nvim.current.buffer[:] = code_block.split('\n')
             self.save_file(path)
         else:
             self.nvim.current.buffer[:] = ["No code found in response"]
-
-    def insert_content_into_buffer(self, filename, content):
-        self.nvim.command(f'silent! bwipeout! {filename}')
-        self.nvim.command('enew')
-        self.nvim.current.buffer[:] = content
 
     def save_file(self, filename):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
