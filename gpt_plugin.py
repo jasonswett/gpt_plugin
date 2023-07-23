@@ -3,6 +3,7 @@ import subprocess
 import pynvim
 from gpt_plugin_package.openai_api_request import OpenAIAPIRequest
 from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
+from gpt_plugin_package.test_failure_request_message import TestFailureRequestMessage
 
 LOG_FILENAME = '/Users/jasonswett/Documents/code/gpt_plugin/log/gpt_plugin.log'
 
@@ -33,17 +34,13 @@ class GptPlugin(object):
         tmux_capture_command = f'tmux capture-pane -t {self.tmux_pane} -p'
         failure_message = subprocess.check_output(tmux_capture_command, shell=True, text=True)
 
-        message = f"""
-This is my test:
-{filename}
-{buffer_content}
+        test_failure_request_message = TestFailureRequestMessage(
+            filename,
+            buffer_content,
+            failure_message
+        )
 
-Here is the failure message:
-{failure_message}
-
-Write me the code that will make this failure message go away."""
-
-        request = self.request(message)
+        request = self.request(str(test_failure_request_message))
         response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
         self.run_test_in_tmux(response.test_command())
