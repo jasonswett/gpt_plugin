@@ -22,10 +22,10 @@ class GptPlugin(object):
 
         self.nvim.command('echo "Waiting for OpenAI API response..."')
 
-        openai_api_response = self.openai_api_response(args)
-        self.write_to_log(str(openai_api_response.body))
-        code_block = openai_api_response.code_block()
-        filename = os.path.join(self.directory, openai_api_response.filename())
+        response = self.openai_api_response(args)
+        self.write_to_log(str(response.body))
+        code_block = response.code_block()
+        filename = os.path.join(self.directory, response.filename())
 
         if code_block:
             self.insert_content_into_buffer(filename, code_block.split('\n'))
