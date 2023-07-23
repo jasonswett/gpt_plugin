@@ -24,8 +24,11 @@ class OpenAIAPIRequest:
 
         return openai.ChatCompletion.create(
           model=OPENAI_MODEL,
-          messages=[
+          messages=self.messages()
+        )
+
+    def messages(self):
+        return [
                 {"role": "system", "content": SYSTEM_CONTENT.strip()},
                 {"role": "user", "content": ' '.join(self.args)}
             ]
-        )

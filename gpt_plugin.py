@@ -23,8 +23,11 @@ class GptPlugin(object):
         self.nvim.command('echo "Waiting for OpenAI API response..."')
 
         request = OpenAIAPIRequest(args)
+        self.write_to_log(str(request.messages()))
+
         response = OpenAIAPIResponse(request.send())
         self.write_to_log(str(response.body))
+
         code_block = response.code_block()
         filename = os.path.join(self.directory, response.filename())
 
