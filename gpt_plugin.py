@@ -13,6 +13,7 @@ class GptPlugin(object):
         self.nvim = nvim
         self.directory = None
         self.tmux_pane = None
+        self.most_recent_test_command = None
 
     @pynvim.command('Gpt', nargs='*', range='')
     def gpt_command(self, args, range):
@@ -25,7 +26,11 @@ class GptPlugin(object):
         request = self.request(' '.join(args))
         response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
-        self.run_test_in_tmux(response.test_command())
+        self.most_recent_test_command = response.test_command()
+
+    @pynvim.command('GptRunTest', nargs='*', range='')
+    def gpt_run_test_command(self, args, range):
+        self.run_test_in_tmux(self.most_recent_test_command)
 
     @pynvim.command('GptSendTestResult', nargs='*', range='')
     def gpt_send_test_result(self, args, range):
