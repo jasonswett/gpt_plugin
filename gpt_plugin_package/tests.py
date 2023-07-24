@@ -44,3 +44,10 @@ def test_sloppy_test_command_extraction():
     content = OpenAIAPIResponseContent(body)
     test_command = content.test_command()
     assert test_command == 'rspec test_spec.rb'
+
+def test_sloppy_test_command_extraction_2():
+    body = 'test_spec.rb\nThe test command is: "rspec test_spec.rb"\n\n```ruby\nRSpec.describe "stuff" do\nend\n```'
+
+    content = OpenAIAPIResponseContent(body)
+    test_command = content.test_command()
+    assert test_command == 'rspec test_spec.rb'

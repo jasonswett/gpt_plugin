@@ -19,5 +19,15 @@ class OpenAIAPIResponseContent:
         command_content = self.body.split('\n', 2)
         if len(command_content) < 2:
             return None
-        command_line = command_content[1].strip().strip('"')
-        return command_line.replace('test command: ', '')
+
+        command_line = command_content[1].strip()
+
+        # Define the list of prefixes
+        prefixes = ['"test command:', 'The test command is: "']
+
+        # Remove any matching prefixes from the command line
+        for prefix in prefixes:
+            if command_line.startswith(prefix):
+                command_line = command_line[len(prefix):]
+
+        return command_line.strip().strip('"')
