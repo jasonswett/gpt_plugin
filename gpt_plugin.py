@@ -7,6 +7,33 @@ from gpt_plugin_package.test_failure_request_message import TestFailureRequestMe
 
 LOG_FILENAME = '/Users/jasonswett/Documents/code/gpt_plugin/log/gpt_plugin.log'
 
+CODE_REQUEST_SYSTEM_CONTENT = """
+You are connected to a Vim plugin that helps me write code.
+Your response should contain the filename, the test command to be used, and the file content.
+The response should contain NOTHING else. No explanation. No preamble.
+
+Good example:
+my_spec.rb
+rspec my_spec.rb
+```ruby
+RSpec.describe "stuff" do
+end
+
+Good example:
+spec/calculator_spec.rb
+rspec spec/calculator_spec.rb
+```ruby
+RSpec.describe Calculator do
+end
+
+Bad example:
+my_spec.rb
+The test command is: "rspec my_spec.rb"
+```ruby
+RSpec.describe "stuff" do
+end
+"""
+
 @pynvim.plugin
 class GptPlugin(object):
     def __init__(self, nvim):
@@ -81,7 +108,11 @@ class GptPlugin(object):
             for buffer in self.nvim.buffers
         ]
 
-        request = OpenAIAPIRequest(user_content + "\n".join(all_file_contents))
+        request = OpenAIAPIRequest(
+            CODE_REQUEST_SYSTEM_CONTENT,
+            user_content + "\n".join(all_file_contents)
+        )
+
         self.write_to_log(str(request.messages()))
         return request
 
