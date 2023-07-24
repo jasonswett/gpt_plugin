@@ -20,9 +20,6 @@ class GptPlugin(object):
         if self.directory is None:
             self.directory = self.prompt_directory()
 
-        if self.tmux_pane is None:
-            self.tmux_pane = self.prompt_tmux_pane()
-
         request = self.request(' '.join(args))
         response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
@@ -30,6 +27,9 @@ class GptPlugin(object):
 
     @pynvim.command('GptRunTest', nargs='*', range='')
     def gpt_run_test_command(self, args, range):
+        if self.tmux_pane is None:
+            self.tmux_pane = self.prompt_tmux_pane()
+
         self.run_test_in_tmux(self.most_recent_test_command)
 
     @pynvim.command('GptSendTestResult', nargs='*', range='')
