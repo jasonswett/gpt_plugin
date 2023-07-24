@@ -143,7 +143,7 @@ class GptPlugin(object):
         return response
 
     def current_filename(self):
-        return self.nvim.current.buffer.name
+        return os.path.relpath(self.nvim.current.buffer.name, self.directory)
 
     def current_buffer_content(self):
         return "\n".join(self.nvim.current.buffer[:])
