@@ -4,6 +4,7 @@ import openai
 SYSTEM_CONTENT = """
 You are connected to a Vim plugin that helps me write code.
 Your response should contain the filename, the test command to be used, and the file content.
+The response should contain NOTHING else. No explanation. No preamble.
 
 Good example:
 my_spec.rb

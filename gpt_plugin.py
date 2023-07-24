@@ -76,7 +76,13 @@ class GptPlugin(object):
             f.write(f"{message}\n")
 
     def request(self, user_content):
-        request = OpenAIAPIRequest(user_content)
+        relevant_file_content = f"""
+Here is some file content that may be relevant:
+
+{self.current_filename()}
+{self.current_buffer_content()}
+"""
+        request = OpenAIAPIRequest(user_content + relevant_file_content)
         self.write_to_log(str(request.messages()))
         return request
 
