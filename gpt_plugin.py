@@ -76,13 +76,12 @@ class GptPlugin(object):
             f.write(f"{message}\n")
 
     def request(self, user_content):
-        relevant_file_content = f"""
-Here is some file content that may be relevant:
+        all_file_contents = [
+            "Here is some file content that may be relevant:\n\n{}{}".format(buffer.name, '\n'.join(buffer[:]))
+            for buffer in self.nvim.buffers
+        ]
 
-{self.current_filename()}
-{self.current_buffer_content()}
-"""
-        request = OpenAIAPIRequest(user_content + relevant_file_content)
+        request = OpenAIAPIRequest(user_content + "\n".join(all_file_contents))
         self.write_to_log(str(request.messages()))
         return request
 
