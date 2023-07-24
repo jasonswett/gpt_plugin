@@ -10,8 +10,5 @@ class OpenAIAPIResponse:
     def filename(self):
         return self.content().filename()
 
-    def test_command(self):
-        return self.content().test_command()
-
     def content(self):
         return OpenAIAPIResponseContent(self.body['choices'][0]['message']['content'])

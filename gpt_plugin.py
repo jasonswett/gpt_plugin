@@ -9,26 +9,23 @@ LOG_FILENAME = '/Users/jasonswett/Documents/code/gpt_plugin/log/gpt_plugin.log'
 
 CODE_REQUEST_SYSTEM_CONTENT = """
 You are connected to a Vim plugin that helps me write code.
-Your response should contain the filename, the test command to be used, and the file content.
+Your response should contain the filename and the file content.
 The response should contain NOTHING else. No explanation. No preamble.
 
 Good example:
 my_spec.rb
-rspec my_spec.rb
 ```ruby
 RSpec.describe "stuff" do
 end
 
 Good example:
 spec/calculator_spec.rb
-rspec spec/calculator_spec.rb
 ```ruby
 RSpec.describe Calculator do
 end
 
 Bad example:
-my_spec.rb
-The test command is: "rspec my_spec.rb"
+Filename: my_spec.rb
 ```ruby
 RSpec.describe "stuff" do
 end
@@ -47,17 +44,26 @@ class GptPlugin(object):
         if self.directory is None:
             self.directory = self.prompt_directory()
 
-        request = self.request(' '.join(args))
+        request = self.request(CODE_REQUEST_SYSTEM_CONTENT, ' '.join(args))
         response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
-        self.most_recent_test_command = response.test_command()
 
     @pynvim.command('GptRunTest', nargs='*', range='')
     def gpt_run_test_command(self, args, range):
         if self.tmux_pane is None:
             self.tmux_pane = self.prompt_tmux_pane()
 
-        self.run_test_in_tmux(self.most_recent_test_command)
+        user_content = f"""
+            Give me a command to run the test {self.current_filename()}.
+            Your response should contain absolutely nothing but the command.
+            Example:
+
+            rspec my_spec.rb
+        """
+
+        request = self.request('', user_content)
+        response = self.response(request)
+        self.run_test_in_tmux(response.content().body)
 
     @pynvim.command('GptSendTestResult', nargs='*', range='')
     def gpt_send_test_result(self, args, range):
@@ -69,10 +75,16 @@ class GptPlugin(object):
             failure_message
         )
 
-        request = self.request(str(test_failure_request_message))
+        user_content = f"""
+            Give me the code to make the following failure go away.
+            I don't want the test to necessarily pass, I ONLY want enough code
+            to make the failure message go away.
+            {str(test_failure_request_message)}
+        """
+
+        request = self.request(CODE_REQUEST_SYSTEM_CONTENT, user_content)
         response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
-        self.run_test_in_tmux(response.test_command())
 
     def insert_code_block(self, filename, code_block):
         if code_block:
@@ -102,14 +114,22 @@ class GptPlugin(object):
         with open(LOG_FILENAME, 'a') as f:
             f.write(f"{message}\n")
 
-    def request(self, user_content):
-        all_file_contents = [
-            "Here is some file content that may be relevant:\n\n{}{}".format(buffer.name, '\n'.join(buffer[:]))
-            for buffer in self.nvim.buffers
-        ]
+    def request(self, system_content, user_content):
+        all_file_contents = []
+        for buffer in self.nvim.buffers:
+            try:
+                relative_path = os.path.relpath(buffer.name, self.directory)
+                file_content = "\n".join(buffer[:])
+                all_file_contents.append(
+                    "Here is some file content that may be relevant:\n\n{}{}".format(
+                        relative_path, file_content
+                    )
+                )
+            except Exception as e:
+                self.write_to_log(f"Error processing buffer {buffer.name} with directory {self.directory}: {str(e)}")
 
         request = OpenAIAPIRequest(
-            CODE_REQUEST_SYSTEM_CONTENT,
+            system_content,
             user_content + "\n".join(all_file_contents)
         )
 
