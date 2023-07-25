@@ -115,7 +115,17 @@ class GptPlugin(object):
             f.write(f"{message}\n")
 
     def request(self, system_content, user_content):
+        request = OpenAIAPIRequest(
+            system_content,
+            user_content + "\n".join(self.all_file_contents())
+        )
+
+        self.write_to_log(str(request.messages()))
+        return request
+
+    def all_file_contents(self):
         all_file_contents = []
+
         for buffer in self.nvim.buffers:
             try:
                 relative_path = os.path.relpath(buffer.name, self.directory)
@@ -128,13 +138,7 @@ class GptPlugin(object):
             except Exception as e:
                 self.write_to_log(f"Error processing buffer {buffer.name} with directory {self.directory}: {str(e)}")
 
-        request = OpenAIAPIRequest(
-            system_content,
-            user_content + "\n".join(all_file_contents)
-        )
-
-        self.write_to_log(str(request.messages()))
-        return request
+        return all_file_contents
 
     def response(self, request):
         self.nvim.command('echo "Waiting for OpenAI API response..."')
