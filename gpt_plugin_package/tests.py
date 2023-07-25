@@ -32,3 +32,14 @@ def test_sloppy_filename_extraction():
     content = OpenAIAPIResponseContent(body)
     filename = content.filename()
     assert filename == 'test_spec.rb'
+
+def test_trig():
+    body = "lib/trigonometry.rb\n```ruby\nclass Trigonometry\n  def self.sin(angle)\n  end\n\n  def self.cos(angle)\n  end\n\n  def self.tan(angle)\n  end\nend"
+    content = OpenAIAPIResponseContent(body)
+    filename = content.filename()
+    assert filename == 'lib/trigonometry.rb'
+
+def test_trig_code_block():
+    body = "lib/trigonometry.rb\n```ruby\nclass Trigonometry\n  def self.sin(angle)\n  end\n\n  def self.cos(angle)\n  end\n\n  def self.tan(angle)\n  end\nend"
+    content = OpenAIAPIResponseContent(body)
+    assert content.code_block() is not None

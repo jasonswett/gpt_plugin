@@ -12,5 +12,5 @@ class OpenAIAPIResponseContent:
         return filename_line.replace('filename: ', '')
 
     def code_block(self):
-        matches = re.findall(r'```(\w+)(.*)```', self.body, re.DOTALL)
-        return matches[0][1].strip() if matches else None
+        lines = self.body.split('\n')
+        return '\n'.join(lines[2:-1])
