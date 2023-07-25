@@ -35,14 +35,12 @@ end
 class GptPlugin(object):
     def __init__(self, nvim):
         self.nvim = nvim
-        self.directory = None
+        self.directory = '.'
         self.tmux_pane = None
         self.most_recent_test_command = None
 
     @pynvim.command('Gpt', nargs='*', range='')
     def gpt_command(self, args, range):
-        if self.directory is None:
-            self.directory = self.prompt_directory()
 
         request = self.request(CODE_REQUEST_SYSTEM_CONTENT, ' '.join(args))
         response = self.response(request)
