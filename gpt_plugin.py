@@ -4,8 +4,7 @@ import pynvim
 from gpt_plugin_package.openai_api_request import OpenAIAPIRequest
 from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
 from gpt_plugin_package.test_failure_request_message import TestFailureRequestMessage
-
-LOG_FILENAME = '/Users/jasonswett/Documents/code/gpt_plugin/log/gpt_plugin.log'
+from gpt_plugin_package.api_logger import APILogger
 
 CODE_REQUEST_SYSTEM_CONTENT = """
 You are connected to a Vim plugin that helps me write code.
@@ -38,6 +37,7 @@ class GptPlugin(object):
         self.directory = '.'
         self.tmux_pane = None
         self.most_recent_test_command = None
+        self.logger = APILogger()
 
     @pynvim.command('Gpt', nargs='*', range='')
     def gpt_command(self, args, range):
@@ -108,17 +108,13 @@ class GptPlugin(object):
     def run_test_in_tmux(self, test_command):
         self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "{test_command}" Enter')
 
-    def write_to_log(self, message):
-        with open(LOG_FILENAME, 'a') as f:
-            f.write(f"{message}\n")
-
     def request(self, system_content, user_content):
         request = OpenAIAPIRequest(
             system_content,
             user_content + "\n".join(self.all_file_contents())
         )
 
-        self.write_to_log(str(request.messages()))
+        self.logger.write(str(request.messages()))
         return request
 
     def all_file_contents(self):
@@ -134,14 +130,14 @@ class GptPlugin(object):
                     )
                 )
             except Exception as e:
-                self.write_to_log(f"Error processing buffer {buffer.name} with directory {self.directory}: {str(e)}")
+                self.logger.write(f"Error processing buffer {buffer.name} with directory {self.directory}: {str(e)}")
 
         return all_file_contents
 
     def response(self, request):
         self.nvim.command('echo "Waiting for OpenAI API response..."')
         response = OpenAIAPIResponse(request.send())
-        self.write_to_log(str(response.body))
+        self.logger.write(str(response.body))
         return response
 
     def current_filename(self):
