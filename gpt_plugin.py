@@ -26,9 +26,6 @@ class GptPlugin(object):
 
     @pynvim.command('GptRunTest', nargs='*', range='')
     def gpt_run_test_command(self, args, range):
-        if self.tmux_pane is None:
-            self.tmux_pane = self.prompt_tmux_pane()
-
         system_content = f"""
             Give me a command to run the test {self.editor.current_filename()}.
             Your response should contain absolutely nothing but the command.
@@ -59,14 +56,12 @@ class GptPlugin(object):
             {str(test_failure_request_message)}
         """
 
-        request = self.code_request(user_content)
+        request = self.code_request(' '.join(args))
         response = self.response(request)
         self.editor.insert_code_block(response.filename(), response.code_block())
 
-    def prompt_tmux_pane(self):
-        return self.nvim.eval('input("tmux pane ID: ")')
-
     def run_test_in_tmux(self, test_command):
+        self.ensure_tmux_pane()
         self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "{test_command}" Enter')
 
     def code_request(self, user_content):
@@ -116,5 +111,10 @@ end
         return response
 
     def tmux_pane_content(self):
+        self.ensure_tmux_pane()
         command = f'tmux capture-pane -t {self.tmux_pane} -p'
         return subprocess.check_output(command, shell=True, text=True)
+
+    def ensure_tmux_pane(self):
+        if self.tmux_pane is None:
+            self.tmux_pane = self.nvim.eval('input("tmux pane ID: ")')
