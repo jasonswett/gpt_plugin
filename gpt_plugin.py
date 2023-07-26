@@ -1,16 +1,19 @@
 import os
 import subprocess
 import pynvim
+
 from gpt_plugin_package.openai_api_request import OpenAIAPIRequest
 from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
 from gpt_plugin_package.test_failure_request_message import TestFailureRequestMessage
 from gpt_plugin_package.api_logger import APILogger
+from gpt_plugin_package.editor import Editor
 
 @pynvim.plugin
 class GptPlugin(object):
     def __init__(self, nvim):
         self.nvim = nvim
         self.directory = '.'
+        self.editor = Editor(nvim, self.directory)
         self.tmux_pane = None
         self.most_recent_test_command = None
         self.logger = APILogger()
@@ -27,7 +30,7 @@ class GptPlugin(object):
             self.tmux_pane = self.prompt_tmux_pane()
 
         system_content = f"""
-            Give me a command to run the test {self.current_filename()}.
+            Give me a command to run the test {self.editor.current_filename()}.
             Your response should contain absolutely nothing but the command.
             Examples:
 
@@ -44,7 +47,7 @@ class GptPlugin(object):
         failure_message = self.tmux_pane_content()
 
         test_failure_request_message = TestFailureRequestMessage(
-            self.current_filename(),
+            self.editor.current_filename(),
             self.current_buffer_content(),
             failure_message
         )
@@ -56,7 +59,7 @@ class GptPlugin(object):
             {str(test_failure_request_message)}
         """
 
-        request = self.request(CODE_REQUEST_SYSTEM_CONTENT, user_content)
+        request = self.code_request(user_content)
         response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
 
@@ -142,9 +145,6 @@ end
         response = OpenAIAPIResponse(request.send())
         self.logger.write(str(response.body))
         return response
-
-    def current_filename(self):
-        return os.path.relpath(self.nvim.current.buffer.name, self.directory)
 
     def current_buffer_content(self):
         return "\n".join(self.nvim.current.buffer[:])
