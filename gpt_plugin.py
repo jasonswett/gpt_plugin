@@ -109,13 +109,11 @@ class GptPlugin(object):
         self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "{test_command}" Enter')
 
     def request(self, system_content, user_content):
-        request = OpenAIAPIRequest(
+        return OpenAIAPIRequest(
             system_content,
             user_content + "\n".join(self.all_file_contents()),
             self.logger
         )
-
-        return request
 
     def all_file_contents(self):
         all_file_contents = []
