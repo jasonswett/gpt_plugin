@@ -107,20 +107,7 @@ end
         )
 
     def user_content_with_context(self, user_content):
-        return user_content + "\nHere is some file content that might be relevant:\n\n" + self.all_file_contents()
-
-    def all_file_contents(self):
-        all_file_contents = []
-
-        for buffer in self.nvim.buffers:
-            try:
-                relative_path = os.path.relpath(buffer.name, self.directory)
-                file_content = "\n".join(buffer[:])
-                all_file_contents.append("{}{}".format(relative_path, file_content))
-            except Exception as e:
-                self.logger.write(f"Error processing buffer {buffer.name} with directory {self.directory}: {str(e)}")
-
-        return "\n".join(all_file_contents)
+        return user_content + "\nHere is some file content that might be relevant:\n\n" + self.editor.all_file_contents()
 
     def response(self, request):
         self.nvim.command('echo "Waiting for OpenAI API response..."')

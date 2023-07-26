@@ -30,3 +30,14 @@ class Editor:
     def save_file(self, filename):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         self.nvim.command(f'w! {filename}')
+
+    def all_file_contents(self):
+        all_file_contents = []
+
+        for buffer in self.nvim.buffers:
+            if buffer.name:  # Check if the buffer is associated with a file
+                relative_path = os.path.relpath(buffer.name, self.directory)
+                file_content = "\n".join(buffer[:])
+                all_file_contents.append("{}{}".format(relative_path, file_content))
+
+        return "\n".join(all_file_contents)
