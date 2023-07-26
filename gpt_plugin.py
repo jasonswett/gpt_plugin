@@ -111,10 +111,10 @@ class GptPlugin(object):
     def request(self, system_content, user_content):
         request = OpenAIAPIRequest(
             system_content,
-            user_content + "\n".join(self.all_file_contents())
+            user_content + "\n".join(self.all_file_contents()),
+            self.logger
         )
 
-        self.logger.write(str(request.messages()))
         return request
 
     def all_file_contents(self):
