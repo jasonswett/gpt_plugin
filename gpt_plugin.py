@@ -50,15 +50,16 @@ class GptPlugin(object):
         if self.tmux_pane is None:
             self.tmux_pane = self.prompt_tmux_pane()
 
-        user_content = f"""
+        system_content = f"""
             Give me a command to run the test {self.current_filename()}.
             Your response should contain absolutely nothing but the command.
-            Example:
+            Examples:
 
             rspec my_spec.rb
+            pytest my_test.py
         """
 
-        request = self.request('', user_content)
+        request = self.request(system_content, ' '.join(args))
         response = self.response(request)
         self.run_test_in_tmux(response.content().body)
 
