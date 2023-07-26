@@ -12,7 +12,6 @@ def nvim():
 
 def test_current_filename(nvim):
     plugin = GptPlugin(nvim)
-    plugin.directory = '.'
     file_path = os.path.join(plugin.directory, "test_file.rb")
     with open(file_path, "w") as f:
         f.write("print('Hello, World!')")
