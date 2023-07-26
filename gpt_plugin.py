@@ -6,30 +6,6 @@ from gpt_plugin_package.openai_api_response import OpenAIAPIResponse
 from gpt_plugin_package.test_failure_request_message import TestFailureRequestMessage
 from gpt_plugin_package.api_logger import APILogger
 
-CODE_REQUEST_SYSTEM_CONTENT = """
-You are connected to a Vim plugin that helps me write code.
-Your response should contain the filename and the file content.
-The response should contain NOTHING else. No explanation. No preamble.
-
-Good example:
-my_spec.rb
-```ruby
-RSpec.describe "stuff" do
-end
-
-Good example:
-spec/calculator_spec.rb
-```ruby
-RSpec.describe Calculator do
-end
-
-Bad example:
-Filename: my_spec.rb
-```ruby
-RSpec.describe "stuff" do
-end
-"""
-
 @pynvim.plugin
 class GptPlugin(object):
     def __init__(self, nvim):
@@ -41,7 +17,7 @@ class GptPlugin(object):
 
     @pynvim.command('Gpt', nargs='*', range='')
     def gpt_command(self, args, range):
-        request = self.request(CODE_REQUEST_SYSTEM_CONTENT, ' '.join(args))
+        request = self.code_request(' '.join(args))
         response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
 
@@ -107,6 +83,36 @@ class GptPlugin(object):
 
     def run_test_in_tmux(self, test_command):
         self.nvim.command(f'!tmux send-keys -t {self.tmux_pane} "{test_command}" Enter')
+
+    def code_request(self, user_content):
+        system_content = """
+You are connected to a Vim plugin that helps me write code.
+Your response should contain the filename and the file content.
+The response should contain NOTHING else. No explanation. No preamble.
+
+Good example:
+my_spec.rb
+```ruby
+RSpec.describe "stuff" do
+end
+
+Good example:
+spec/calculator_spec.rb
+```ruby
+RSpec.describe Calculator do
+end
+
+Bad example:
+Filename: my_spec.rb
+```ruby
+RSpec.describe "stuff" do
+end
+"""
+        return OpenAIAPIRequest(
+            system_content,
+            self.user_content_with_context(user_content),
+            self.logger
+        )
 
     def request(self, system_content, user_content):
         return OpenAIAPIRequest(
