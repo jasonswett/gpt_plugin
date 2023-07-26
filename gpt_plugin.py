@@ -41,7 +41,6 @@ class GptPlugin(object):
 
     @pynvim.command('Gpt', nargs='*', range='')
     def gpt_command(self, args, range):
-
         request = self.request(CODE_REQUEST_SYSTEM_CONTENT, ' '.join(args))
         response = self.response(request)
         self.insert_code_block(response.filename(), response.code_block())
