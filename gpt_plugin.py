@@ -111,9 +111,12 @@ class GptPlugin(object):
     def request(self, system_content, user_content):
         return OpenAIAPIRequest(
             system_content,
-            user_content + "\nHere is some file content that might be relevant:\n\n" + self.all_file_contents(),
+            self.user_content_with_context(user_content),
             self.logger
         )
+
+    def user_content_with_context(self, user_content):
+        return user_content + "\nHere is some file content that might be relevant:\n\n" + self.all_file_contents()
 
     def all_file_contents(self):
         all_file_contents = []
