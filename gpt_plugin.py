@@ -78,9 +78,6 @@ class GptPlugin(object):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         self.nvim.command(f'w! {filename}')
 
-    def prompt_directory(self):
-        return self.nvim.eval('input("Project root directory: ")')
-
     def prompt_tmux_pane(self):
         return self.nvim.eval('input("tmux pane ID: ")')
 
