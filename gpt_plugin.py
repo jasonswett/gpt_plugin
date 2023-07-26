@@ -22,7 +22,7 @@ class GptPlugin(object):
     def gpt_command(self, args, range):
         request = self.code_request(' '.join(args))
         response = self.response(request)
-        self.insert_code_block(response.filename(), response.code_block())
+        self.editor.insert_code_block(response.filename(), response.code_block())
 
     @pynvim.command('GptRunTest', nargs='*', range='')
     def gpt_run_test_command(self, args, range):
@@ -61,22 +61,7 @@ class GptPlugin(object):
 
         request = self.code_request(user_content)
         response = self.response(request)
-        self.insert_code_block(response.filename(), response.code_block())
-
-    def insert_code_block(self, filename, code_block):
-        if code_block:
-            if not self.is_buffer_with_filename_open(filename) and not self.is_current_buffer_empty():
-                self.nvim.command('tabnew')
-
-            self.nvim.current.buffer[:] = code_block.split('\n')
-            path = os.path.join(self.directory, filename)
-            self.save_file(path)
-        else:
-            self.nvim.current.buffer[:] = ["No code found in response"]
-
-    def save_file(self, filename):
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        self.nvim.command(f'w! {filename}')
+        self.editor.insert_code_block(response.filename(), response.code_block())
 
     def prompt_tmux_pane(self):
         return self.nvim.eval('input("tmux pane ID: ")')
@@ -149,11 +134,3 @@ end
     def tmux_pane_content(self):
         command = f'tmux capture-pane -t {self.tmux_pane} -p'
         return subprocess.check_output(command, shell=True, text=True)
-
-    def is_current_buffer_empty(self):
-        current_buffer_name = self.nvim.eval('bufname("%")')
-        return current_buffer_name == ""
-
-    def is_buffer_with_filename_open(self, filename):
-        all_open_buffers = self.nvim.buffers
-        return any([buffer.name.endswith(filename) for buffer in all_open_buffers])
