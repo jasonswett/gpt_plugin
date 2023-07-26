@@ -48,7 +48,7 @@ class GptPlugin(object):
 
         test_failure_request_message = TestFailureRequestMessage(
             self.editor.current_filename(),
-            self.current_buffer_content(),
+            self.editor.current_buffer_content(),
             failure_message
         )
 
@@ -114,9 +114,6 @@ end
         response = OpenAIAPIResponse(request.send())
         self.logger.write(str(response.body))
         return response
-
-    def current_buffer_content(self):
-        return "\n".join(self.nvim.current.buffer[:])
 
     def tmux_pane_content(self):
         command = f'tmux capture-pane -t {self.tmux_pane} -p'

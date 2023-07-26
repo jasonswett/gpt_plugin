@@ -41,3 +41,6 @@ class Editor:
                 all_file_contents.append("{}{}".format(relative_path, file_content))
 
         return "\n".join(all_file_contents)
+
+    def current_buffer_content(self):
+        return "\n".join(self.nvim.current.buffer[:])
