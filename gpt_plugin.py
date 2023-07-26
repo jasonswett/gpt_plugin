@@ -111,7 +111,7 @@ class GptPlugin(object):
     def request(self, system_content, user_content):
         return OpenAIAPIRequest(
             system_content,
-            user_content + "\n".join(self.all_file_contents()),
+            user_content + self.all_file_contents(),
             self.logger
         )
 
@@ -130,7 +130,7 @@ class GptPlugin(object):
             except Exception as e:
                 self.logger.write(f"Error processing buffer {buffer.name} with directory {self.directory}: {str(e)}")
 
-        return all_file_contents
+        return "\n".join(all_file_contents)
 
     def response(self, request):
         self.nvim.command('echo "Waiting for OpenAI API response..."')
