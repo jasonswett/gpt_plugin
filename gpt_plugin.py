@@ -111,7 +111,7 @@ class GptPlugin(object):
     def request(self, system_content, user_content):
         return OpenAIAPIRequest(
             system_content,
-            user_content + self.all_file_contents(),
+            user_content + "\nHere is some file content that might be relevant:\n\n" + self.all_file_contents(),
             self.logger
         )
 
@@ -122,11 +122,7 @@ class GptPlugin(object):
             try:
                 relative_path = os.path.relpath(buffer.name, self.directory)
                 file_content = "\n".join(buffer[:])
-                all_file_contents.append(
-                    "Here is some file content that may be relevant:\n\n{}{}".format(
-                        relative_path, file_content
-                    )
-                )
+                all_file_contents.append("{}{}".format(relative_path, file_content))
             except Exception as e:
                 self.logger.write(f"Error processing buffer {buffer.name} with directory {self.directory}: {str(e)}")
 
