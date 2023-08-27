@@ -1,7 +1,7 @@
 import os
 import openai
 
-OPENAI_MODEL="gpt-3.5-turbo-16k"
+OPENAI_MODEL="gpt-4"
 
 class OpenAIAPIRequest:
     def __init__(self, system_content, user_content, logger):
