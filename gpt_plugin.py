@@ -56,7 +56,7 @@ class GptPlugin(object):
             {str(test_failure_request_message)}
         """
 
-        request = self.code_request(' '.join(args))
+        request = self.code_request(user_content)
         response = self.response(request)
         self.editor.insert_code_block(response.filename(), response.code_block())
 
@@ -107,6 +107,7 @@ end
     def response(self, request):
         self.nvim.command('echo "Waiting for OpenAI API response..."')
         response = OpenAIAPIResponse(request.send())
+        self.logger.write("API Response:")
         self.logger.write(str(response.body))
         return response
 

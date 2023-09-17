@@ -11,6 +11,7 @@ class OpenAIAPIRequest:
         self.logger = logger
 
     def send(self):
+        self.logger.write("API Request:")
         self.logger.write(str(self.messages()))
 
         return openai.ChatCompletion.create(
