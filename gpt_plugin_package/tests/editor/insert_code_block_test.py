@@ -39,7 +39,9 @@ def test_current_buffer_is_only_buffer_and_current_buffer_is_empty(nvim):
 
     os.remove(file_path)
 
-def test_current_buffer_is_only_buffer_and_current_buffer_is_not_empty(nvim):
+# When current buffer is the only buffer and the current buffer is not empty,
+# assert that a new tab matching the filename contains the expected contents
+def test_current_buffer_is_only_buffer_and_current_buffer_is_not_empty_expected_contents(nvim):
     # Setup
     directory = '.'
     editor = Editor(nvim, directory)
@@ -63,3 +65,30 @@ def test_current_buffer_is_only_buffer_and_current_buffer_is_not_empty(nvim):
 
     # Cleanup
     os.remove(file_path)
+
+# When current buffer is the only buffer and the current buffer is not empty,
+# assert that the current buffer's contents are undisturbed
+def test_current_buffer_is_only_buffer_and_current_buffer_is_not_empty_original_content_undisturbed(nvim):
+    # Setup
+    directory = '.'
+    editor = Editor(nvim, directory)
+
+    # Create and save a buffer with filename "jason.rb" and content "i am jason"
+    jason_file_name = "jason.rb"
+    jason_content = "i am jason"
+    nvim.current.buffer[:] = [jason_content]
+    nvim.command(f'w {jason_file_name}')
+
+    # Action: Insert a new code block into "martin.rb"
+    file_name = "martin.rb"
+    code_block = "print('hi')"
+    editor.insert_code_block(file_name, code_block)
+
+    # Verification
+    # Switch back to the original buffer by filename and verify its content
+    nvim.command(f'buffer {jason_file_name}')
+    assert "\n".join(nvim.current.buffer[:]) == jason_content
+
+    # Cleanup: Removing the created "jason.rb" file
+    os.remove(os.path.join(directory, "jason.rb"))
+    os.remove(os.path.join(directory, "martin.rb"))
