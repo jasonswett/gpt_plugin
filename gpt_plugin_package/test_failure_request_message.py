@@ -1,4 +1,6 @@
 class TestFailureRequestMessage:
+    __test__ = False
+
     def __init__(self, filename, buffer_content, failure_message):
         self.filename = filename
         self.buffer_content = buffer_content
