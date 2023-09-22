@@ -1,7 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-from .openai_api_response_content import OpenAIAPIResponseContent
+from gpt_plugin_package.openai_api_response_content import OpenAIAPIResponseContent
 
 def test_code_block_with_ruby_code_block():
     body = 'test_spec.rb\n```ruby\nRSpec.describe "stuff" do\nend\n```'
