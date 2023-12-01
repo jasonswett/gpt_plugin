@@ -67,7 +67,6 @@ class TestCurrentBufferIsOnlyBuffer:
 
         os.remove(os.path.join(self.directory, "jason.rb"))
 
-    @pytest.mark.skip(reason="Not ready to fix this yet")
     def test_4(self, nvim):
         editor = Editor(nvim, self.directory)
 
