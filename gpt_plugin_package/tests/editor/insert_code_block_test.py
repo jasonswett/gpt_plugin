@@ -82,3 +82,27 @@ class TestCurrentBufferIsOnlyBuffer:
 
         # And we insert another code block into Tab B
         editor.insert_code_block("calculator.rb", "puts 2 + 2 = 4")
+
+        # Tab A still contains the test code
+        nvim.command('buffer calculator_spec.rb')
+        assert nvim.current.buffer[:] == ["this is some test code"]
+
+    def test_5(self, nvim):
+        editor = Editor(nvim, self.directory)
+
+        # When some content exists in Tab A
+        nvim.current.buffer[:] = ["this is some test code"]
+        nvim.command(f'w calculator_spec.rb')
+
+        # And we insert a code block into Tab B
+        editor.insert_code_block("calculator.rb", "puts 1 + 1 = 2")
+
+        # And we navigate to Tab A
+        nvim.command(f'buffer calculator_spec.rb')
+
+        # And we insert another code block into Tab B
+        editor.insert_code_block("calculator.rb", "puts 2 + 2 = 4")
+
+        # Tab B contains the application code
+        nvim.command('buffer calculator.rb')
+        assert nvim.current.buffer[:] == ["puts 2 + 2 = 4"]
