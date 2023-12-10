@@ -32,7 +32,7 @@ class TestCurrentBufferIsOnlyBuffer:
 
         # And we insert a code block for
         # a new file called martin.rb
-        editor.insert_code_block("martin.rb", "puts 'hello world'")
+        editor.write_code_block("martin.rb", "puts 'hello world'")
 
         # Then the result is that the current buffer is martin.rb
         assert editor.current_filename() == "martin.rb"
@@ -44,7 +44,7 @@ class TestCurrentBufferIsOnlyBuffer:
 
         # And we insert a code block for
         # a new file called martin.rb
-        editor.insert_code_block("martin.rb", "puts 'hello world'")
+        editor.write_code_block("martin.rb", "puts 'hello world'")
 
         # The content of the martin.rb buffer gets replaced
         # with the inserted code block
@@ -59,7 +59,7 @@ class TestCurrentBufferIsOnlyBuffer:
         nvim.command(f'w jason.rb')
 
         # And we insert a code block into a different tab
-        editor.insert_code_block("martin.rb", "puts 'hello world'")
+        editor.write_code_block("martin.rb", "puts 'hello world'")
 
         # The original tab is untouched
         nvim.command(f'buffer jason.rb')
@@ -75,13 +75,13 @@ class TestCurrentBufferIsOnlyBuffer:
         nvim.command(f'w calculator_spec.rb')
 
         # And we insert a code block into Tab B
-        editor.insert_code_block("calculator.rb", "puts 1 + 1 = 2")
+        editor.write_code_block("calculator.rb", "puts 1 + 1 = 2")
 
         # And we navigate to Tab A
         nvim.command(f'buffer calculator_spec.rb')
 
         # And we insert another code block into Tab B
-        editor.insert_code_block("calculator.rb", "puts 2 + 2 = 4")
+        editor.write_code_block("calculator.rb", "puts 2 + 2 = 4")
 
         # Tab A still contains the test code
         nvim.command('buffer calculator_spec.rb')
@@ -95,13 +95,13 @@ class TestCurrentBufferIsOnlyBuffer:
         nvim.command(f'w calculator_spec.rb')
 
         # And we insert a code block into Tab B
-        editor.insert_code_block("calculator.rb", "puts 1 + 1 = 2")
+        editor.write_code_block("calculator.rb", "puts 1 + 1 = 2")
 
         # And we navigate to Tab A
         nvim.command(f'buffer calculator_spec.rb')
 
         # And we insert another code block into Tab B
-        editor.insert_code_block("calculator.rb", "puts 2 + 2 = 4")
+        editor.write_code_block("calculator.rb", "puts 2 + 2 = 4")
 
         # Tab B contains the application code
         nvim.command('buffer calculator.rb')
@@ -114,7 +114,7 @@ class TestCurrentBufferIsOnlyBuffer:
         empty_code_block = ""
 
         # When we try to insert this empty code block into a new file
-        editor.insert_code_block("empty_file.rb", empty_code_block)
+        editor.write_code_block("empty_file.rb", empty_code_block)
 
         # Then the current buffer should contain the text "No code found in response"
         assert nvim.current.buffer[:] == ["No code found in response"], "Current buffer does not contain expected message for empty code block"

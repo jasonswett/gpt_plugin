@@ -22,7 +22,7 @@ class GptPlugin(object):
     def gpt_command(self, args, range):
         request = self.code_request(' '.join(args))
         response = self.response(request)
-        self.editor.insert_code_block(response.filename(), response.code_block())
+        self.editor.write_code_block(response.filename(), response.code_block())
 
     @pynvim.command('GptRunTest', nargs='*', range='')
     def gpt_run_test_command(self, args, range):
@@ -58,7 +58,7 @@ class GptPlugin(object):
 
         request = self.code_request(user_content)
         response = self.response(request)
-        self.editor.insert_code_block(response.filename(), response.code_block())
+        self.editor.write_code_block(response.filename(), response.code_block())
 
     def run_test_in_tmux(self, test_command):
         self.ensure_tmux_pane()

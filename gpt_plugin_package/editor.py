@@ -8,7 +8,7 @@ class Editor:
     def current_filename(self):
         return os.path.relpath(self.nvim.current.buffer.name, self.directory)
 
-    def insert_code_block(self, filename, code_block):
+    def write_code_block(self, filename, code_block):
         if not code_block:
             self.nvim.current.buffer[:] = ["No code found in response"]
             return
