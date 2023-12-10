@@ -106,3 +106,15 @@ class TestCurrentBufferIsOnlyBuffer:
         # Tab B contains the application code
         nvim.command('buffer calculator.rb')
         assert nvim.current.buffer[:] == ["puts 2 + 2 = 4"]
+
+    def test_6(self, nvim):
+        editor = Editor(nvim, self.directory)
+
+        # Given an empty code block
+        empty_code_block = ""
+
+        # When we try to insert this empty code block into a new file
+        editor.insert_code_block("empty_file.rb", empty_code_block)
+
+        # Then the current buffer should contain the text "No code found in response"
+        assert nvim.current.buffer[:] == ["No code found in response"], "Current buffer does not contain expected message for empty code block"
