@@ -110,6 +110,26 @@ class TestCurrentBufferIsOnlyBuffer:
     def test_6(self, nvim):
         editor = Editor(nvim, self.directory)
 
+        # When some content exists in Tab A
+        nvim.current.buffer[:] = ["this is some test code"]
+        nvim.command(f'w calculator_spec.rb')
+
+        # And we insert a code block into Tab B
+        editor.write_code_block("calculator.rb", "puts 1 + 1 = 2")
+
+        # And we navigate to Tab A
+        nvim.command(f'buffer calculator_spec.rb')
+
+        # And we insert another code block into Tab B
+        editor.write_code_block("calculator.rb", "puts 2 + 2 = 4")
+
+        # Tab A does not contain the application code
+        nvim.command('buffer calculator_spec.rb')
+        assert nvim.current.buffer[:] != ["puts 2 + 2 = 4"]
+
+    def test_7(self, nvim):
+        editor = Editor(nvim, self.directory)
+
         # Given an empty code block
         empty_code_block = ""
 
